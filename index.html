@@ -1288,9 +1288,9 @@ $("submitBtn").onclick = function() {
       orderItems = []; renderList(); updateBtn();
       $("modal").classList.remove("show");
       toast("下单成功！老公马上就来~ 💕");
+      // 微信通知老公
+      scSend(SCKEY_HUSBAND, "🔔 鑫鑫下单啦", submittedItems.map(function(i){return i.name + (i.qty>1?' x'+i.qty:'');}).join("、"));
       loadAllOrders();
-      // 延迟发通知，不影响下单流程
-      // notifyHusband 已移除，改由老公端轮询检测
     }).catch(function(e) {
       toast("提交失败，重试一下~"); $("mk").disabled = false;
     });
