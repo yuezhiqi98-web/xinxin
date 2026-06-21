@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>鑫鑫的点餐小厨房</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#f9f7f4;
+  --surface:#fff;
+  --border:#ece6dd;
+  --text:#3b3228;
+  --text2:#8c7b6b;
+  --pink:#d4787c;
+  --pink-l:#fdf3f4;
+  --pink-h:#c06367;
+  --pink-bg:linear-gradient(135deg,#fdf3f4 0%,#f9f7f4 100%);
+  --green:#5d9b6f;
+  --green-l:#edf6ef;
+  --amber:#d4953a;
+  --amber-l:#fef8f1;
+  --blue:#4a90b8;
+  --blue-l:#eef5f9;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.04);
+  --shadow:0 1px 6px rgba(0,0,0,.05),0 2px 12px rgba(0,0,0,.04);
+  --shadow-lg:0 4px 20px rgba(0,0,0,.06),0 8px 32px rgba(0,0,0,.04);
+  --radius-sm:8px;
+  --radius:12px;
+  --radius-lg:16px;
+  --transition:0.2s cubic-bezier(0.4,0,0.2,1);
+}
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Login */
+.login-screen{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1100;
+  min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+  background:linear-gradient(160deg,#fdf3f4 0%,#f9f7f4 40%,#fdf3f4 100%);
+  position:relative;
+  overflow:hidden;
+}
+.login-screen::before{
+  content:"";
+  position:absolute;
+  top:-50%;right:-30%;
+  width:500px;height:500px;
+  background:radial-gradient(circle,rgba(212,120,124,.06) 0%,transparent 70%);
+  border-radius:50%;
+}
+.login-screen::after{
+  content:"";
+  position:absolute;
+  bottom:-30%;left:-20%;
+  width:400px;height:400px;
+  background:radial-gradient(circle,rgba(212,120,124,.04) 0%,transparent 70%);
+  border-radius:50%;
+}
+.login-card{
+  background:var(--surface);
+  border-radius:var(--radius-lg);
+  padding:44px 40px;
+  box-shadow:var(--shadow-lg);
+  width:380px;
+  max-width:100%;
+  text-align:center;
+  border:1px solid var(--border);
+  position:relative;
+  z-index:1;
+}
+.login-card .icon-ring{
+  width:56px;height:56px;
+  border-radius:50%;
+  background:var(--pink-l);
+  display:inline-flex;
+  align-items:center;justify-content:center;
+  font-size:28px;
+  margin-bottom:16px;
+}
+.login-card h1{
+  font-size:22px;font-weight:700;
+  margin-bottom:4px;color:var(--text);
+  letter-spacing:-0.3px;
+}
+.login-card .subtitle{
+  font-size:14px;color:var(--text2);margin-bottom:28px;
+}
+.login-card .field{
+  text-align:left;margin-bottom:14px;
+}
+.login-card .field label{
+  display:block;font-size:12px;font-weight:600;
+  color:var(--text2);margin-bottom:6px;
+  text-transform:uppercase;letter-spacing:.5px;
+}
+.login-card input{
+  width:100%;padding:11px 14px;
+  border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  font-size:15px;background:var(--bg);outline:none;
+  transition:var(--transition);color:var(--text);
+}
+.login-card input:focus{
+  border-color:var(--pink);
+  box-shadow:0 0 0 3px rgba(212,120,124,.1);
+}
+.login-card input::placeholder{color:#d0ccc4}
+.login-btn{
+  width:100%;padding:12px;border:none;border-radius:var(--radius-sm);
+  font-size:15px;font-weight:600;cursor:pointer;
+  transition:var(--transition);
+  letter-spacing:-0.2px;
+}
+.login-btn.wife{
+  background:var(--pink);color:#fff;
+  box-shadow:0 2px 8px rgba(212,120,124,.3);
+}
+.login-btn.wife:hover{
+  background:var(--pink-h);
+  box-shadow:0 4px 14px rgba(212,120,124,.4);
+  transform:translateY(-1px);
+}
+.login-btn.wife:active{transform:translateY(0)}
+.login-btn.husband{
+  background:transparent;color:var(--text2);
+  margin-top:6px;font-size:13px;font-weight:500;
+}
+.login-btn.husband:hover{color:var(--text);background:var(--bg)}
+/* Role toggle */
+.role-toggle{display:flex;gap:8px;margin-bottom:4px}
+.role-opt{
+  flex:1;padding:10px;border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);background:var(--surface);
+  cursor:pointer;font-size:14px;font-weight:500;
+  transition:var(--transition);font-family:inherit;
+  color:var(--text2);text-align:center;
+}
+.role-opt:hover{border-color:var(--pink);color:var(--pink)}
+.role-opt.active{
+  background:var(--pink-l);border-color:var(--pink);
+  color:var(--pink);font-weight:600;
+}
+
+.login-error{
+  color:#e74c3c;font-size:13px;margin-top:8px;
+  display:none;animation:shake .3s ease;
+}
+.login-error.show{display:block}
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-6px)}
+  75%{transform:translateX(6px)}
+}
+
+/* App */
+.app{display:none;min-height:100vh;flex-direction:column}
+.app.show{display:flex}
+
+/* Header */
+.header{
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:0 28px;height:60px;
+  display:flex;align-items:center;
+  justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+  backdrop-filter:blur(12px);
+  background:rgba(255,255,255,.92);
+}
+.header-left{display:flex;align-items:center;gap:14px}
+.header h1{
+  font-size:17px;font-weight:650;
+  letter-spacing:-0.3px;
+}
+.header .role-badge{
+  font-size:11px;padding:3px 12px;border-radius:20px;
+  font-weight:500;letter-spacing:.2px;
+}
+.role-badge.wife{background:var(--pink-l);color:var(--pink)}
+.role-badge.husband{background:#f5f5f5;color:var(--text2)}
+.header-right{display:flex;align-items:center;gap:14px}
+.logout-btn{
+  background:none;border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:6px 14px;
+  font-size:12px;cursor:pointer;color:var(--text2);
+  transition:var(--transition);
+}
+.logout-btn:hover{background:var(--bg);color:var(--text)}
+.conn-dot{width:9px;height:9px;border-radius:50%;display:inline-block;transition:var(--transition)}
+.conn-dot.online{background:var(--green);box-shadow:0 0 6px rgba(93,155,111,.4)}
+.conn-dot.offline{background:#e0d8ce}
+
+/* Layout */
+.layout{
+  max-width:960px;margin:0 auto;
+  padding:24px 28px;flex:1;width:100%;
+}
+
+/* Greeting */
+.wife-greeting{
+  background:var(--pink-l);
+  border-radius:var(--radius);
+  padding:16px 20px;margin-bottom:22px;
+  font-size:15px;color:var(--pink);
+  display:flex;align-items:center;gap:8px;
+  border:1px solid rgba(212,120,124,.1);
+  font-weight:500;
+}
+
+/* Sidebar layout */
+.wife-main{display:flex;gap:0;min-height:500px;margin-bottom:16px}
+.cat-sidebar{
+  width:150px;flex-shrink:0;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius) 0 0 var(--radius);
+  overflow-y:auto;max-height:70vh;
+  display:flex;flex-direction:column;
+}
+.cat-sidebar::-webkit-scrollbar{width:4px}
+.cat-sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.cat-card{
+  display:flex;align-items:center;gap:8px;
+  padding:12px 14px;cursor:pointer;
+  transition:var(--transition);
+  border-bottom:1px solid var(--border);
+  position:relative;
+}
+.cat-card:last-child{border-bottom:none}
+.cat-card:hover{background:var(--bg)}
+.cat-card.active{
+  background:var(--pink-l);
+  border-right:3px solid var(--pink);
+}
+.cat-card .cat-emoji{font-size:22px;flex-shrink:0}
+.cat-card .cat-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap}
+.cat-card .cat-hint{display:none}
+.cat-card .cat-count{font-size:10px;color:var(--text2)}
+/* Right dish panel */
+.dish-panel{
+  flex:1;background:var(--surface);
+  border:1px solid var(--border);
+  border-left:none;
+  border-radius:0 var(--radius) var(--radius) 0;
+  padding:16px 20px;overflow-y:auto;
+  max-height:70vh;
+}
+.dish-panel::-webkit-scrollbar{width:4px}
+.dish-panel::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.dish-panel-header{font-size:15px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:6px;color:var(--text)}
+
+/* Input area */
+.input-area{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:22px;box-shadow:var(--shadow);
+}
+.input-area h3{
+  font-size:15px;margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+  font-weight:600;
+}
+
+/* Dish grid */
+.dish-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(115px,1fr));gap:10px;margin-bottom:20px}
+.dish-card{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius);padding:12px 8px;text-align:center;cursor:pointer;transition:var(--transition)}
+.dish-card:hover{border-color:var(--pink);box-shadow:var(--shadow);transform:translateY(-1px)}
+.dish-card .dish-emoji{font-size:26px;margin-bottom:4px;display:block}
+.dish-card .dish-name{font-size:11px;font-weight:500;color:var(--text);line-height:1.3}
+.dish-card .dish-price{font-size:10px;color:var(--text2);margin-top:2px}
+.dish-custom{padding:16px;border:1.5px dashed var(--border);border-radius:var(--radius);text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:100%}
+.dish-custom .custom-label{font-size:20px}
+.dish-custom input{width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;text-align:center;outline:none;font-family:inherit;background:var(--bg);transition:var(--transition)}
+.dish-custom input:focus{border-color:var(--pink);box-shadow:0 0 0 2px rgba(212,120,124,.08)}
+.dish-custom .custom-add{padding:6px 20px;border-radius:14px;background:var(--pink);color:#fff;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:var(--transition)}
+.dish-custom .custom-add:hover{background:var(--pink-h)}
+
+/* Cart with quantity */
+.cart-qty{display:flex;align-items:center;gap:4px;margin-left:auto}
+.cart-qty-btn{width:24px;height:24px;border:1px solid var(--border);border-radius:50%;background:var(--surface);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--text2);transition:var(--transition);line-height:1}
+.cart-qty-btn:hover{background:var(--bg);border-color:var(--pink);color:var(--pink)}
+.cart-qty-num{min-width:20px;text-align:center;font-size:13px;font-weight:500}
+
+/* Time input */
+.time-row{display:flex;align-items:center;gap:8px;margin-top:12px}
+.time-row label{font-size:12px;color:var(--text2);white-space:nowrap;font-weight:500}
+.time-row input{padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:inherit;background:var(--bg);transition:var(--transition)}
+.time-row input[type="date"]{min-width:122px;flex-shrink:0}
+.time-row input:focus{border-color:var(--pink);box-shadow:0 0 0 2px rgba(212,120,124,.08)}
+.time-row select{padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;outline:none;font-family:inherit;background:var(--bg);color:var(--text);cursor:pointer;transition:var(--transition);appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:24px}
+.time-row select:focus{border-color:var(--pink);box-shadow:0 0 0 2px rgba(212,120,124,.08)}
+
+.input-area h3 .highlight{color:var(--pink)}
+.input-row{display:flex;gap:10px;margin-bottom:16px}
+.input-row input{
+  flex:1;padding:11px 14px;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);
+  font-size:14px;background:var(--bg);
+  outline:none;transition:var(--transition);
+  font-family:inherit;color:var(--text);
+}
+.input-row input:focus{
+  border-color:var(--pink);
+  box-shadow:0 0 0 3px rgba(212,120,124,.08);
+}
+.input-row input::placeholder{color:#d0ccc4}
+.add-item-btn{
+  padding:11px 22px;border:none;border-radius:var(--radius-sm);
+  background:var(--pink);color:#fff;
+  font-size:14px;font-weight:600;cursor:pointer;
+  transition:var(--transition);white-space:nowrap;
+  font-family:inherit;
+  box-shadow:0 2px 8px rgba(212,120,124,.25);
+}
+.add-item-btn:hover{
+  background:var(--pink-h);
+  box-shadow:0 3px 12px rgba(212,120,124,.35);
+  transform:translateY(-1px);
+}
+.add-item-btn:active{transform:translateY(0)}
+
+/* Order list (current cart) */
+.order-list{margin-top:8px}
+.order-list-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;border-radius:var(--radius-sm);
+  margin-bottom:6px;
+  background:var(--bg);border:1px solid transparent;
+  font-size:14px;transition:var(--transition);
+  animation:slideIn .25s ease;
+}
+@keyframes slideIn{
+  from{opacity:0;transform:translateX(-8px)}
+  to{opacity:1;transform:translateX(0)}
+}
+.order-list-item .item-cat{
+  font-size:11px;background:var(--pink-l);color:var(--pink);
+  padding:2px 8px;border-radius:8px;white-space:nowrap;
+  font-weight:500;
+}
+.order-list-item .item-name{flex:1;color:var(--text)}
+.order-list-item .remove-btn{
+  background:none;border:none;color:#d5d5d5;cursor:pointer;
+  font-size:18px;padding:0 4px;line-height:1;
+  transition:var(--transition);
+  width:24px;height:24px;display:flex;align-items:center;justify-content:center;
+  border-radius:50%;
+}
+.order-list-item .remove-btn:hover{
+  color:#e74c3c;background:rgba(231,76,60,.08);
+}
+
+/* Note */
+.order-note-section{margin-top:14px}
+.order-note-section textarea{
+  width:100%;padding:11px 14px;border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);font-size:13px;background:var(--bg);
+  outline:none;resize:vertical;min-height:52px;
+  font-family:inherit;color:var(--text);
+  transition:var(--transition);line-height:1.5;
+}
+.order-note-section textarea:focus{
+  border-color:var(--pink);
+  box-shadow:0 0 0 3px rgba(212,120,124,.08);
+}
+.order-note-section textarea::placeholder{color:#d0ccc4}
+
+/* Submit */
+.submit-row{
+  margin-top:16px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.submit-row .item-count{
+  font-size:13px;color:var(--text2);font-weight:500;
+}
+.submit-btn{
+  padding:12px 36px;border:none;border-radius:var(--radius-sm);
+  background:var(--pink);color:#fff;
+  font-size:15px;font-weight:600;cursor:pointer;
+  transition:var(--transition);font-family:inherit;
+  box-shadow:0 2px 12px rgba(212,120,124,.3);
+  letter-spacing:-0.2px;
+}
+.submit-btn:hover{
+  background:var(--pink-h);
+  box-shadow:0 4px 18px rgba(212,120,124,.4);
+  transform:translateY(-1px);
+}
+.submit-btn:active{transform:translateY(0)}
+.submit-btn:disabled{
+  background:#e8e4de;color:#c5bfb5;
+  box-shadow:none;cursor:not-allowed;transform:none;
+}
+
+/* Wife orders section */
+.wife-orders-section h3{
+  font-size:15px;margin-bottom:14px;
+  display:flex;align-items:center;gap:6px;
+  font-weight:600;
+}
+.wife-order-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:14px 18px;margin-bottom:10px;
+  box-shadow:var(--shadow-sm);
+  transition:var(--transition);
+}
+.wife-order-card:hover{
+  box-shadow:var(--shadow);
+  border-color:#e0d8ce;
+}
+.wife-order-card .wo-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:8px;
+}
+.wife-order-card .wo-time{
+  font-size:11px;color:var(--text2);
+  font-weight:500;
+}
+.wife-order-card .wo-status{
+  font-size:10px;padding:3px 10px;border-radius:10px;
+  font-weight:600;letter-spacing:.3px;
+  transition:var(--transition);
+}
+.wo-status.pending{background:#fff8e6;color:#b8860b}
+.wo-status.accepted{background:var(--blue-l);color:var(--blue)}
+
+/* Wife order actions */
+.wo-actions{display:flex;gap:8px;margin-top:10px}
+.wo-action-btn{
+  padding:4px 12px;border-radius:14px;border:1.5px solid var(--border);
+  background:var(--surface);cursor:pointer;font-size:11px;font-weight:500;
+  transition:var(--transition);font-family:inherit;color:var(--text2);
+}
+.wo-action-btn:hover{background:var(--bg)}
+.wo-action-btn.edit:hover{border-color:var(--blue);color:var(--blue)}
+.wo-action-btn.cancel:hover{border-color:#e74c3c;color:#e74c3c;background:rgba(231,76,60,.05)}
+.wo-status.cancelled{background:#f0f0f0;color:#999}
+.wo-status.done{background:var(--green-l);color:var(--green)}
+.wife-order-card .wo-items{
+  font-size:13px;color:var(--text);
+  line-height:1.6;font-weight:450;
+}
+.wife-order-card .wo-note{
+  font-size:11px;color:var(--amber);
+  margin-top:6px;padding:5px 10px;
+  background:var(--amber-l);
+  border-radius:6px;
+  display:inline-block;
+}
+
+/* Husband orders */
+.orders-area h2{
+  font-size:16px;margin-bottom:18px;
+  display:flex;align-items:center;gap:8px;
+  font-weight:650;
+}
+.status-tabs{
+  display:flex;gap:6px;margin-left:auto;
+  background:var(--bg);
+  border-radius:20px;padding:3px;
+}
+.status-tab{
+  padding:6px 16px;border:none;border-radius:18px;
+  font-size:12px;cursor:pointer;
+  background:transparent;color:var(--text2);
+  transition:var(--transition);font-weight:500;
+  font-family:inherit;
+}
+.status-tab:hover{color:var(--text)}
+.status-tab.active{
+  background:var(--surface);color:var(--text);
+  font-weight:600;
+  box-shadow:var(--shadow-sm);
+}
+
+.order-card{
+  background:var(--surface);
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+  padding:20px 22px;margin-bottom:14px;
+  box-shadow:var(--shadow-sm);
+  transition:var(--transition);
+}
+.order-card:hover{box-shadow:var(--shadow)}
+.order-card-header{
+  display:flex;align-items:center;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+.order-card-header .time{
+  font-size:12px;color:var(--text2);font-weight:500;
+}
+.order-status{
+  font-size:10px;padding:3px 10px;border-radius:10px;
+  font-weight:600;letter-spacing:.3px;
+}
+.order-status.pending{background:#fff8e6;color:#b8860b}
+.order-status.accepted{background:var(--blue-l);color:var(--blue)}
+.order-status.done{background:var(--green-l);color:var(--green)}
+.order-status.cancelled{background:#f0f0f0;color:#999}
+
+.order-item-line{
+  display:flex;align-items:center;gap:8px;
+  padding:4px 0;font-size:13px;
+}
+.order-item-line .ocat{
+  font-size:10px;background:var(--pink-l);color:var(--pink);
+  padding:1px 7px;border-radius:6px;white-space:nowrap;
+  font-weight:500;
+}
+.order-note{
+  font-size:12px;color:var(--amber);
+  margin-top:8px;padding:6px 10px;
+  background:var(--amber-l);
+  border-radius:6px;
+  border-left:3px solid var(--amber);
+}
+.order-card-actions{
+  display:flex;gap:8px;margin-top:14px;
+}
+.order-action-btn{
+  padding:7px 18px;border-radius:var(--radius-sm);
+  font-size:12px;font-weight:600;cursor:pointer;
+  transition:var(--transition);font-family:inherit;
+  letter-spacing:-0.1px;
+}
+.btn-accept{
+  background:var(--blue-l);border:1.5px solid var(--blue);
+  color:var(--blue);
+}
+.btn-accept:hover{background:var(--blue);color:#fff}
+.btn-buy{
+  background:var(--amber-l);border:1.5px solid var(--amber);
+  color:var(--amber);
+}
+.btn-buy:hover{background:var(--amber);color:#fff}
+.btn-cook{
+  background:var(--green-l);border:1.5px solid var(--green);
+  color:var(--green);
+}
+.btn-cook:hover{background:var(--green);color:#fff}
+.btn-done{
+  background:var(--green);border:1.5px solid var(--green);
+  color:#fff;
+}
+.btn-done:hover{background:#4d8a5e}
+
+/* Empty state */
+.empty-state{
+  text-align:center;padding:64px 20px;
+}
+.empty-state .emoji{
+  font-size:52px;margin-bottom:14px;
+  display:block;opacity:.6;
+}
+.empty-state p{
+  font-size:14px;color:#d0ccc4;
+}
+
+/* Toast */
+.toast{
+  position:fixed;top:80px;left:50%;transform:translateX(-50%);
+  background:rgba(59,50,40,.9);color:#fff;
+  padding:10px 24px;border-radius:24px;
+  font-size:13px;z-index:9999;
+  opacity:0;pointer-events:none;
+  transition:opacity .3s ease,transform .3s ease;
+  transform:translateX(-50%) translateY(-8px);
+  backdrop-filter:blur(8px);
+  font-weight:500;letter-spacing:-0.1px;
+}
+.toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+/* Modal */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.35);
+  z-index:200;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .25s ease;
+  backdrop-filter:blur(2px);
+}
+.modal-overlay.show{opacity:1;pointer-events:auto}
+.modal{
+  background:var(--surface);
+  border-radius:var(--radius-lg);
+  width:420px;max-width:92vw;
+  max-height:82vh;overflow-y:auto;
+  box-shadow:var(--shadow-lg);
+  transform:scale(.96) translateY(8px);
+  transition:transform .25s ease;
+}
+.modal-overlay.show .modal{
+  transform:scale(1) translateY(0);
+}
+.modal-header{
+  padding:22px 26px 0;
+  font-size:17px;font-weight:650;
+  letter-spacing:-0.2px;
+}
+.modal-body{padding:18px 26px 26px}
+.modal-body .summary-item{
+  display:flex;align-items:center;gap:8px;
+  padding:5px 0;font-size:14px;
+}
+.modal-body .summary-item .scat{
+  font-size:10px;background:var(--pink-l);color:var(--pink);
+  padding:1px 7px;border-radius:6px;font-weight:500;
+}
+.modal-body .divider{
+  height:1px;background:var(--border);
+  margin:10px 0;
+}
+.modal-body .total-row{
+  display:flex;justify-content:space-between;
+  font-size:16px;font-weight:700;
+  padding:2px 0;
+}
+.modal-actions{
+  display:flex;gap:10px;margin-top:20px;
+}
+.btn-cancel{
+  flex:1;padding:10px;border-radius:var(--radius-sm);
+  border:1.5px solid var(--border);background:var(--surface);
+  cursor:pointer;font-size:14px;color:var(--text2);
+  font-weight:500;transition:var(--transition);
+  font-family:inherit;
+}
+.btn-cancel:hover{background:var(--bg)}
+.btn-confirm{
+  flex:2;padding:10px;border-radius:var(--radius-sm);
+  border:none;font-size:14px;font-weight:600;cursor:pointer;
+  transition:var(--transition);font-family:inherit;
+}
+.btn-confirm.pink{
+  background:var(--pink);color:#fff;
+  box-shadow:0 2px 10px rgba(212,120,124,.3);
+}
+.btn-confirm.pink:hover{
+  background:var(--pink-h);
+  box-shadow:0 3px 14px rgba(212,120,124,.4);
+}
+
+@media (max-width:600px){
+  .cat-sidebar{width:110px}
+  .cat-card{padding:10px}
+  .cat-card .cat-emoji{font-size:18px}
+  .cat-card .cat-name{font-size:11px}
+  .dish-panel{padding:12px 14px}
+  .header{padding:0 14px}
+  .layout{padding:14px}
+  .input-area{padding:16px}
+  .input-row{flex-direction:column}
+  .login-card{padding:32px 24px}
+  .order-card{padding:14px 16px}
+  .order-card-actions{flex-wrap:wrap}
+  .submit-btn{padding:12px 28px}
+}
+
+/* Star rating */
+.star-rating{display:inline-flex;gap:3px;cursor:pointer;user-select:none}
+.star-rating .star{font-size:20px;color:#ddd;transition:color .15s,transform .15s}
+.star-rating .star.hover,.star-rating .star.active{color:#f5a623;transform:scale(1.15)}
+.star-rating.readonly .star{cursor:default}
+.star-rating.readonly .star.active{transform:none}
+.review-box{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+.review-box textarea{width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:inherit;resize:vertical;min-height:48px;outline:none;background:var(--bg);transition:var(--transition)}
+.review-box textarea:focus{border-color:var(--pink)}
+.review-submit-btn{padding:6px 14px;background:var(--pink);color:#fff;border:none;border-radius:var(--radius-sm);font-size:12px;cursor:pointer;align-self:flex-end;transition:var(--transition)}
+.review-submit-btn:hover{opacity:.85}
+.review-display{font-size:12px;color:var(--text);background:var(--bg2,#fafafa);padding:8px 10px;border-radius:6px;margin-top:4px}
+.review-display .stars{color:#f5a623;font-size:14px}
+.review-display .reply{color:var(--blue);border-left:2px solid var(--blue);padding-left:8px;margin-top:4px}
+
+
+/* Dish quick-add modal */
+.dish-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.35);z-index:1000;display:flex;align-items:center;justify-content:center;animation:fadeIn .15s ease}
+.dish-modal{background:var(--surface);border-radius:var(--radius);padding:24px;width:320px;max-width:90vw;box-shadow:0 8px 40px rgba(0,0,0,.15);animation:slideUp .2s ease}
+.dish-modal .dm-emoji{font-size:48px;text-align:center;display:block;margin-bottom:8px}
+.dish-modal .dm-name{font-size:18px;font-weight:600;text-align:center;color:var(--text);margin-bottom:6px}
+.dish-modal .dm-cat{font-size:12px;text-align:center;color:var(--text2);margin-bottom:16px}
+.dish-modal .dm-qty-row{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:16px}
+.dish-modal .dm-qty-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition);color:var(--text);font-family:inherit}
+.dish-modal .dm-qty-btn:hover{border-color:var(--pink);color:var(--pink)}
+.dish-modal .dm-qty-num{font-size:22px;font-weight:700;min-width:40px;text-align:center;color:var(--text)}
+.dish-modal .dm-qty-btn:disabled{opacity:.3;cursor:default}
+.dish-modal .dm-add-btn{display:block;width:100%;padding:11px;border:none;border-radius:var(--radius-sm);background:var(--pink);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:var(--transition)}
+.dish-modal .dm-add-btn:hover{opacity:.9}
+.dish-modal .dm-close{position:absolute;top:10px;right:10px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--text2);padding:4px 8px}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+
+/* Wife view tabs */
+.wife-tabs{display:flex;gap:0;margin-bottom:18px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden}
+.wife-tab{flex:1;padding:12px 0;text-align:center;font-size:13px;font-weight:600;cursor:pointer;transition:var(--transition);color:var(--text2);border-bottom:2px solid transparent;background:transparent;border-left:none;border-right:none;border-top:none;font-family:inherit;position:relative}
+.wife-tab:hover{color:var(--text);background:var(--bg)}
+.wife-tab.active{color:var(--pink);border-bottom-color:var(--pink);background:var(--pink-l)}
+.wife-tab .badge{background:var(--pink);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:4px}
+/* Wife panels */
+.wife-panel{display:none}
+.wife-panel.active{display:block}
+
+
+/* Floating cart */
+.floating-cart{position:fixed;bottom:20px;right:20px;z-index:900}
+.fc-toggle{width:64px;height:64px;border-radius:50%;background:var(--pink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(212,120,124,.35);transition:var(--transition);position:relative;user-select:none}
+.fc-toggle:hover{transform:scale(1.08);box-shadow:0 6px 24px rgba(212,120,124,.45)}
+.fc-toggle span{position:absolute;top:-4px;right:-4px;background:#e74c3c;color:#fff;font-size:10px;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:700;padding:0 4px}
+.fc-panel{position:absolute;bottom:72px;right:0;width:340px;max-height:480px;background:var(--surface);border-radius:var(--radius);box-shadow:0 8px 32px rgba(0,0,0,.15);border:1px solid var(--border);overflow:hidden;display:flex;flex-direction:column;animation:slideUp .2s ease}
+.fc-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border);font-weight:600;font-size:13px;color:var(--text)}
+.fc-close{background:none;border:none;font-size:18px;cursor:pointer;color:var(--text2);padding:0 4px;line-height:1}
+.fc-close:hover{color:var(--text)}
+.fc-panel .order-list{flex:1;overflow-y:auto;padding:10px 14px;max-height:240px}
+.fc-panel .order-list::-webkit-scrollbar{width:3px}
+.fc-panel .order-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.fc-panel .time-row{padding:8px 14px;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.fc-panel .submit-row{padding:8px 14px 12px}
+.fc-panel .submit-btn{width:100%}
+
+
+</style>
+</head>
+<body>
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="icon-ring">💕</div>
+    <h1>鑫鑫的点餐小厨房</h1>
+    <p class="subtitle">专属巩亚鑫的私厨点餐</p>
+    <div class="field">
+      <label>姓名</label>
+      <input type="text" id="nameInput" placeholder="输入姓名" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>身份</label>
+      <div class="role-toggle" id="roleToggle">
+        <button class="role-opt active" data-role="wife">👧 老婆</button>
+        <button class="role-opt" data-role="husband">👨 老公</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>密码</label>
+      <input type="password" id="passInput" placeholder="输入密码" autocomplete="off">
+    </div>
+    <button class="login-btn wife" id="loginBtn">进入小厨房 💕</button>
+    <p class="login-error" id="loginError">姓名或密码不对哦~</p>
+  </div>
+</div>
+
+<div class="app" id="app">
+  <div class="header">
+    <div class="header-left">
+      <h1 id="headerTitle">💕 鑫鑫的点餐小厨房</h1>
+      <span class="role-badge" id="roleBadge"></span>
+    </div>
+    <div class="header-right">
+      <span class="conn-dot offline" id="connDot" title="连接状态"></span>
+      <button class="logout-btn" id="logoutBtn">退出</button>
+    </div>
+  </div>
+
+  <div class="layout" id="wifeView">
+    <div class="wife-greeting">💕 鑫鑫，今天想吃什么？老公给你安排~</div>
+
+    <div class="wife-tabs" id="wifeTabs">
+      <button class="wife-tab active" data-panel="order-food">🍽️ 点餐</button>
+      <button class="wife-tab" data-panel="my-orders">📋 订单</button>
+    </div>
+
+    <!-- 点餐 -->
+    <div class="wife-panel active" id="panel-order-food">
+      <div class="wife-main">
+        <div class="cat-sidebar" id="catSidebar"></div>
+        <div class="dish-panel" id="dishPanel">
+          <div class="dish-panel-header" id="dishPanelHeader">👆 左边选一个大类开始点餐~</div>
+          <div class="dish-grid" id="dishGrid"></div>
+        </div>
+      </div>
+    
+    <!-- 浮动清单 -->
+    <div class="floating-cart" id="floatingCart" style="display:none">
+      <div class="fc-toggle" id="fcToggle">
+        🛒 <span id="fcCount">0</span>
+      </div>
+      <div class="fc-panel" id="fcPanel" style="display:none">
+        <div class="fc-header">
+          <span>🛒 当前清单</span>
+          <button class="fc-close" id="fcClose">×</button>
+        </div>
+        <div class="order-list" id="orderList">
+          <div style="text-align:center;padding:16px;color:#d0ccc4;font-size:12px;">还没选东西呢~</div>
+        </div>
+        <div class="time-row" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap;">
+          <label style="width:100%;margin-bottom:6px;">⏰ 期望收到时间</label>
+          <input type="date" id="expectDate" style="width:auto;min-width:110px;padding:6px 8px;font-size:11px;"><select id="expectHour" style="min-width:46px;padding:6px 4px;font-size:11px;"></select><span style="font-size:11px;color:var(--text2);">点</span><select id="expectMin" style="min-width:50px;padding:6px 4px;font-size:11px;"></select><span style="font-size:11px;color:var(--text2);">分</span>
+        </div>
+        <div class="submit-row" style="margin-top:10px;">
+          <button class="submit-btn" id="submitBtn" disabled>下单 💕</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+
+
+    <!-- 订单 -->
+    <div class="wife-panel" id="panel-my-orders">
+      <h3 style="font-size:15px;margin-bottom:14px;display:flex;align-items:center;gap:6px;font-weight:600;">📋 我的订单<div class="status-tabs" id="wifeStatusTabs"><button class="status-tab active" data-status="active">进行中</button><button class="status-tab" data-status="done">已完成</button><button class="status-tab" data-status="cancelled">已取消</button></div></h3>
+      <div id="wifeOrdersList">
+        <div class="empty-state"><span class="emoji">📝</span><p>还没有订单~</p></div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="layout" id="husbandView" 
+ style="display:none;">
+    <div class="orders-area">
+      <h2>
+        📋 鑫鑫的订单
+        <div class="status-tabs" id="statusTabs">
+          <button class="status-tab active" data-status="pending">待处理</button>
+          <button class="status-tab" data-status="accepted">已接单</button>
+          <button class="status-tab" data-status="done">已完成</button>
+        </div>
+      </h2>
+      <div id="ordersList"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header" id="modalHeader"></div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+var API = "https://rsfnzeqsgyhxgvosaaiw.supabase.co/rest/v1";
+var KEY = "sb_publishable_PRKHukrk8DEn4iGnPsT9ZQ_p_Y43hH1";
+
+function api(path, opts) {
+  opts = opts || {};
+  var headers = { "apikey": KEY, "Authorization": "Bearer " + KEY, "Content-Type": "application/json" };
+  if (opts.prefer) headers["Prefer"] = opts.prefer;
+  return fetch(API + path, { method: opts.method || "GET", headers: headers, body: opts.body ? JSON.stringify(opts.body) : undefined })
+    .then(function(r) {
+      if (!r.ok) return r.text().then(function(t) { throw new Error(t); });
+      if (r.status === 204 || r.status === 201 && r.headers.get("Content-Length") === "0") return null;
+      return r.json();
+    });
+}
+
+function loadAllOrders() {
+  return api("/orders?select=*&order=created_at.desc")
+    .then(function(rows) {
+      allOrders = (rows || []).map(function(row) { return Object.assign({ id: row.id, created_at: row.created_at }, row.data || {}); });
+      return allOrders;
+    })
+    .catch(function(e) { console.warn("加载订单失败:", e); allOrders = []; return []; });
+}
+
+function insertOrder(data) {
+  return api("/orders", { method: "POST", body: { data: data }, prefer: "return=representation" });
+}
+
+function updateOrderById(id, newData) {
+  return api("/orders?id=eq." + id, { method: "PATCH", body: { data: newData } });
+}
+
+// ====== Server酱微信推送 ======
+// 去 sct.ftqq.com 注册，把 SendKey 填在这里：
+var SCKEY_HUSBAND = "SCT367869Tui1YQW7gLTY2LT7Ee4hTJFAT";
+
+// ====== Server酱微信推送 ======
+var SCKEY_HUSBAND = "SCT367869Tui1YQW7gLTY2LT7Ee4hTJFAT";
+var SCKEY_WIFE = "";
+
+function scSend(key, title, desp) {
+  if (!key) return;
+  var url = "https://sctapi.ftqq.com/" + key + ".send?title=" + encodeURIComponent(title) + "&desp=" + encodeURIComponent(desp || "");
+  console.log("📱 通知:", title);
+  fetch(url).then(function(r) {
+    console.log("📱 通知成功, 状态:", r.status);
+  }).catch(function(e) {
+    console.error("📱 通知失败:", e);
+  });
+}
+
+
+
+var allOrders = [];
+var role = null;
+var activeCat = null;
+var orderItems = [];
+var orderFilter = "pending";
+var wifeOrderFilter = "active";
+var pollTimer = null;
+var pendingRatings = {};
+var pendingReviews = {};
+
+var CATS = [
+  { key: "staple",  name: "主食",     emoji: "🍚", hint: "米饭、面条、馒头…" },
+  { key: "dish",    name: "菜品",     emoji: "🥘", hint: "荤菜、素菜、凉菜…" },
+  { key: "soup",    name: "汤品",     emoji: "🍲", hint: "排骨汤、蛋花汤…" },
+  { key: "snack",   name: "小吃零食", emoji: "🍟", hint: "炸鸡、薯片、卤味…" },
+  { key: "drink",   name: "饮品",     emoji: "🧋", hint: "奶茶、果汁、咖啡…" },
+  { key: "dessert", name: "甜品水果", emoji: "🍉", hint: "蛋糕、冰淇淋、水果…" },
+  { key: "other",   name: "其他",     emoji: "📝", hint: "随便写…" },
+];
+
+var PRESET = {
+  staple: [
+    {name:"红烧牛肉面", emoji:"🍜"},{name:"番茄鸡蛋盖饭", emoji:"🍛"},{name:"宫保鸡丁饭", emoji:"🍗"},
+    {name:"扬州炒饭", emoji:"🍚"},{name:"炸酱面", emoji:"🍝"},{name:"黄焖鸡米饭", emoji:"🍲"},
+    {name:"酸菜鱼米线", emoji:"🐟"},{name:"麻辣香锅", emoji:"🥘"},{name:"兰州拉面", emoji:"🍜"},
+    {name:"蛋炒饭", emoji:"🍳"},{name:"葱油拌面", emoji:"🧅"},{name:"卤肉饭", emoji:"🥩"},
+    {name:"煲仔饭", emoji:"🍚"},{name:"热干面", emoji:"🍜"},{name:"饺子", emoji:"🥟"},
+    {name:"馄饨", emoji:"🥟"},{name:"肉夹馍", emoji:"🥙"},{name:"馒头", emoji:"🥖"},
+  ],
+  dish: [
+    {name:"鱼香肉丝", emoji:"🥩"},{name:"宫保鸡丁", emoji:"🍗"},{name:"糖醋里脊", emoji:"🍖"},
+    {name:"麻婆豆腐", emoji:"🧈"},{name:"西红柿炒鸡蛋", emoji:"🍳"},{name:"干煸四季豆", emoji:"🫘"},
+    {name:"蒜蓉西兰花", emoji:"🥦"},{name:"红烧排骨", emoji:"🍖"},{name:"回锅肉", emoji:"🥓"},
+    {name:"水煮鱼", emoji:"🐟"},{name:"辣子鸡", emoji:"🌶️"},{name:"红烧肉", emoji:"🍖"},
+    {name:"可乐鸡翅", emoji:"🍗"},{name:"蒜苔炒肉", emoji:"🥬"},{name:"蚝油生菜", emoji:"🥬"},
+    {name:"油焖大虾", emoji:"🦐"},{name:"地三鲜", emoji:"🥔"},{name:"酸辣土豆丝", emoji:"🥔"},
+    {name:"手撕包菜", emoji:"🥬"},{name:"葱爆羊肉", emoji:"🐑"},{name:"清蒸鲈鱼", emoji:"🐟"},
+    {name:"香菇油菜", emoji:"🍄"},
+  ],
+  soup: [
+    {name:"紫菜蛋花汤", emoji:"🥚"},{name:"番茄蛋汤", emoji:"🍅"},{name:"排骨玉米汤", emoji:"🌽"},
+    {name:"酸辣汤", emoji:"🌶️"},{name:"豆腐汤", emoji:"🧈"},{name:"冬瓜汤", emoji:"🥒"},
+    {name:"萝卜排骨汤", emoji:"🦴"},{name:"菌菇汤", emoji:"🍄"},{name:"鸡汤", emoji:"🐔"},
+    {name:"疙瘩汤", emoji:"🥣"},{name:"银耳莲子羹", emoji:"🪷"},{name:"海带汤", emoji:"🫧"},
+    {name:"丝瓜蛋汤", emoji:"🥒"},{name:"山药排骨汤", emoji:"🦴"},
+  ],
+  snack: [
+    {name:"春卷", emoji:"🥟"},{name:"煎饺", emoji:"🥟"},{name:"炸鸡翅", emoji:"🍗"},
+    {name:"凉拌黄瓜", emoji:"🥒"},{name:"皮蛋豆腐", emoji:"🥚"},{name:"糖拌西红柿", emoji:"🍅"},
+    {name:"薯条", emoji:"🍟"},{name:"卤味", emoji:"🍖"},{name:"烤串", emoji:"🍢"},
+    {name:"炸鸡排", emoji:"🍗"},{name:"爆米花", emoji:"🍿"},{name:"花生米", emoji:"🥜"},
+    {name:"毛豆", emoji:"🫛"},{name:"麻辣烫", emoji:"🥘"},{name:"关东煮", emoji:"🍢"},
+    {name:"泡椒凤爪", emoji:"🐔"},{name:"凉皮", emoji:"🍝"},{name:"肉松小贝", emoji:"🧁"},
+    {name:"烤红薯", emoji:"🍠"},
+  ],
+  drink: [
+    {name:"冰镇柠檬水", emoji:"🍋"},{name:"珍珠奶茶", emoji:"🧋"},{name:"酸梅汤", emoji:"🍹"},
+    {name:"椰汁", emoji:"🥥"},{name:"可乐", emoji:"🥤"},{name:"果汁", emoji:"🧃"},
+    {name:"咖啡", emoji:"☕"},{name:"豆浆", emoji:"🥛"},{name:"红豆奶茶", emoji:"🫘"},
+    {name:"杨枝甘露", emoji:"🥭"},{name:"抹茶拿铁", emoji:"🍵"},{name:"椰子水", emoji:"🧉"},
+    {name:"银耳雪梨", emoji:"🍐"},{name:"草莓奶昔", emoji:"🍓"},{name:"百香果茶", emoji:"🍊"},
+    {name:"蜂蜜柚子茶", emoji:"🍯"},{name:"牛奶", emoji:"🥛"},
+  ],
+  dessert: [
+    {name:"芒果布丁", emoji:"🍮"},{name:"红豆沙", emoji:"🫘"},{name:"双皮奶", emoji:"🥛"},
+    {name:"冰淇淋", emoji:"🍦"},{name:"西瓜", emoji:"🍉"},{name:"草莓", emoji:"🍓"},
+    {name:"蛋糕", emoji:"🍰"},{name:"布丁", emoji:"🍮"},{name:"提拉米苏", emoji:"🍫"},
+    {name:"芒果班戟", emoji:"🥭"},{name:"糯米糍", emoji:"🍡"},{name:"榴莲酥", emoji:"🥮"},
+    {name:"蛋挞", emoji:"🥚"},{name:"葡萄", emoji:"🍇"},{name:"樱桃", emoji:"🍒"},
+    {name:"芒果", emoji:"🥭"},{name:"菠萝", emoji:"🍍"},{name:"哈密瓜", emoji:"🍈"},
+    {name:"蓝莓", emoji:"🫐"},{name:"水蜜桃", emoji:"🍑"},
+  ],
+  other: []
+};
+
+function cat(k) { for (var i = 0; i < CATS.length; i++) { if (CATS[i].key === k) return CATS[i]; } return null; }
+var $ = function(id) { return document.getElementById(id); };
+
+function toast(msg) {
+  var t = $("toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._t); t._t = setTimeout(function() { t.classList.remove("show"); }, 2200);
+}
+
+function setOnline(yes) {
+  $("connDot").className = "conn-dot " + (yes ? "online" : "offline");
+  $("connDot").title = yes ? "已连接" : "未连接";
+}
+
+
+function startPolling() {
+  stopPolling();
+  function poll() {
+    loadAllOrders().then(function() {
+      setOnline(true);
+      if (role === "husband") { renderOrders(); autoCleanup(); }
+      if (role === "wife") renderWifeOrders();
+    }).catch(function() { setOnline(false); });
+  }
+  poll();
+  pollTimer = setInterval(poll, 3000);
+}
+
+function stopPolling() {
+  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+}
+
+var loginRole = "wife";
+$("roleToggle").querySelectorAll(".role-opt").forEach(function(btn) {
+  btn.onclick = function() {
+    loginRole = btn.dataset.role;
+    $("roleToggle").querySelectorAll(".role-opt").forEach(function(b) { b.classList.remove("active"); });
+    btn.classList.add("active");
+  };
+});
+
+$("loginBtn").onclick = function() {
+  var name = $("nameInput").value.trim();
+  var password = $("passInput").value.trim();
+  if (!name || !password) { toast("请填写姓名和密码~"); return; }
+  if (loginRole === "wife") {
+    if (name !== "巩亚鑫" || password !== "5201314") { toast("姓名或密码不对哦~"); return; }
+    role = "wife";
+  } else {
+    if (name !== "岳智祺" || password !== "xinxin") { toast("姓名或密码不对哦~"); return; }
+    role = "husband";
+  }
+  $("loginScreen").style.display = "none";
+  $("app").style.display = "flex";
+  setupUI();
+  startPolling();
+
+};
+
+// 退出登录
+$("logoutBtn").onclick = function() {
+  if (!confirm("确定要退出吗？")) return;
+  stopPolling();
+  role = null; orderItems = [];
+  $("app").style.display = "none";
+  $("loginScreen").style.display = "";
+  $("nameInput").value = ""; $("passInput").value = "";
+};
+
+function setupUI() {
+  if (role === "wife") {
+    $("headerTitle").textContent = "💕 鑫鑫的点餐小厨房";
+    $("roleBadge").textContent = "鑫鑫"; $("roleBadge").className = "role-badge wife";
+    $("wifeView").style.display = ""; $("husbandView").style.display = "none";
+    activeCat = CATS[0]; orderItems = [];
+    initWifeTabs();
+    renderCats(); renderDishes(); renderList(); updateBtn(); renderWifeTabs(); renderWifeOrders();
+    // 填充时间选择器
+    var hSel = $("expectHour"), mSel = $("expectMin");
+    for (var i = 0; i < 24; i++) { var v = String(i).padStart(2,"0"); hSel.innerHTML += '<option value="' + v + '"' + (i===18?' selected':'') + '>' + v + '</option>'; }
+    for (var i = 0; i < 60; i+=5) { var v = String(i).padStart(2,"0"); mSel.innerHTML += '<option value="' + v + '"' + (i===0?' selected':'') + '>' + v + '</option>'; }
+    // 默认今天日期
+    var today = new Date(); $("expectDate").value = today.getFullYear() + "-" + String(today.getMonth()+1).padStart(2,"0") + "-" + String(today.getDate()).padStart(2,"0");
+  } else {
+    $("headerTitle").textContent = "👨‍🍳 老公的后厨";
+    $("roleBadge").textContent = "老公"; $("roleBadge").className = "role-badge husband";
+    $("wifeView").style.display = "none"; $("husbandView").style.display = "";
+    renderTabs(); renderOrders();
+  }
+}
+
+function renderCats() {
+  $("catSidebar").innerHTML = CATS.map(function(c) {
+    var count = orderItems.filter(function(i) { return i.cat === c.key; }).length;
+    return '<div class="cat-card' + (c.key === activeCat.key ? " active" : "") + '" data-k="' + c.key + '">'
+      + '<span class="cat-emoji">' + c.emoji + '</span>'
+      + '<span class="cat-name">' + c.name + '</span>'
+      + (count ? '<span class="cat-count">' + count + '</span>' : '')
+      + '</div>';
+  }).join("");
+  $("catSidebar").querySelectorAll(".cat-card").forEach(function(card) {
+    card.onclick = function() {
+      activeCat = cat(card.dataset.k);
+      renderCats(); renderDishes();
+    };
+  });
+}
+
+function addItemWithQty(name, catKey, qty, note) {
+  note = note || "";
+  var existing = orderItems.find(function(item) {
+    return item.cat === catKey && item.name === name;
+  });
+  if (existing) {
+    existing.qty = (existing.qty || 1) + qty;
+    if (note) existing.note = note;
+  } else {
+    orderItems.push({ cat: catKey, name: name, qty: qty || 1, note: note });
+  }
+  renderList(); updateBtn(); updateCartBadge();
+  toast(name + " 已加入清单");
+}
+
+function renderDishes() {
+  var el = $("dishGrid");
+  var c = activeCat;
+  $("dishPanelHeader").innerHTML = c.emoji + " " + c.name + ' <span style="font-size:11px;color:var(--text2);font-weight:400">' + c.hint + '</span>';
+  var dishes = PRESET[c.key] || [];
+  var html = "";
+  dishes.forEach(function(d) {
+    html += '<div class="dish-card" data-name="' + d.name + '" data-emoji="' + d.emoji + '">'
+      + '<span class="dish-emoji">' + d.emoji + '</span>'
+      + '<span class="dish-name">' + d.name + '</span></div>';
+  });
+  html += '<div class="dish-custom">'
+    + '<span class="custom-label">📝 其他</span>'
+    + '<input type="text" id="customDishInput" placeholder="自己写…" autocomplete="off">'
+    + '<button class="custom-add" id="customDishAdd">加入清单</button></div>';
+  el.innerHTML = html;
+
+  el.querySelectorAll(".dish-card").forEach(function(card) {
+    card.onclick = function() {
+      showDishModal(card.dataset.name, card.dataset.emoji, c);
+    };
+  });
+
+  var ci = $("customDishInput");
+  $("customDishAdd").onclick = function() {
+    var v = ci.value.trim(); if (!v) return;
+    showDishModal(v, "📝", c);
+    ci.value = "";
+  };
+  ci.onkeydown = function(e) {
+    if (e.key === "Enter") {
+      var v = ci.value.trim(); if (!v) return;
+      showDishModal(v, "📝", c);
+      ci.value = "";
+    }
+  };
+}
+
+function showDishModal(name, emoji, catObj) {
+  var existing = document.querySelector(".dish-modal-overlay");
+  if (existing) existing.remove();
+  var qty = 1;
+  var overlay = document.createElement("div");
+  overlay.className = "dish-modal-overlay";
+  overlay.innerHTML = '<div class="dish-modal" onclick="event.stopPropagation()">'
+    + '<span class="dm-emoji">' + emoji + '</span>'
+    + '<div class="dm-name">' + name + '</div>'
+    + '<div class="dm-cat">' + catObj.emoji + " " + catObj.name + '</div>'
+    + '<div class="dm-qty-row">'
+    + '<button class="dm-qty-btn" id="dmMinus">-</button>'
+    + '<span class="dm-qty-num" id="dmQty">1</span>'
+    + '<button class="dm-qty-btn" id="dmPlus">+</button>'
+    + '</div>'
+    + '<textarea id="dmNote" placeholder="备注：多放辣、少盐…" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:inherit;resize:none;min-height:40px;outline:none;background:var(--bg);margin-bottom:12px;box-sizing:border-box"></textarea>'
+    + '<button class="dm-add-btn" id="dmAddBtn">加入清单 · 1 份</button>'
+    + '</div>';
+  document.body.appendChild(overlay);
+
+  function updateUI() {
+    document.getElementById("dmQty").textContent = qty;
+    document.getElementById("dmAddBtn").textContent = "加入清单 · " + qty + " 份";
+    document.getElementById("dmMinus").disabled = qty <= 1;
+  }
+
+  document.getElementById("dmMinus").onclick = function() { if (qty > 1) { qty--; updateUI(); } };
+  document.getElementById("dmPlus").onclick = function() { qty++; updateUI(); };
+  document.getElementById("dmAddBtn").onclick = function() {
+    var note = document.getElementById("dmNote").value.trim();
+    addItemWithQty(name, catObj.key, qty, note);
+    renderCats();
+    overlay.remove();
+  };
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+}
+
+function updateCartBadge() {
+  var total = orderItems.reduce(function(s, i) { return s + (i.qty || 1); }, 0);
+  var fc = $("fcCount");
+  if (fc) { fc.textContent = total; fc.style.display = total > 0 ? "" : "none"; }
+  $("submitBtn").disabled = total === 0;
+}
+
+// Floating cart toggle
+
+
+
+function initWifeTabs() {
+  var tabs = document.querySelectorAll("#wifeTabs .wife-tab");
+  tabs.forEach(function(tab) {
+    tab.onclick = function() {
+      var panelId = "panel-" + tab.dataset.panel;
+      tabs.forEach(function(t) { t.classList.remove("active"); });
+      tab.classList.add("active");
+      document.querySelectorAll(".wife-panel").forEach(function(p) { p.classList.remove("active"); });
+      document.getElementById(panelId).classList.add("active");
+      if (tab.dataset.panel === "my-orders") renderWifeOrders();
+    };
+  });
+  var cart = document.getElementById("floatingCart");
+  if (cart) cart.style.display = "";
+  var ft = document.getElementById("fcToggle"), fc = document.getElementById("fcClose");
+  if (ft) ft.onclick = function() { var p = document.getElementById("fcPanel"); if (p) p.style.display = p.style.display === "none" ? "" : "none"; };
+  if (fc) fc.onclick = function() { var p = document.getElementById("fcPanel"); if (p) p.style.display = "none"; };
+}
+
+function renderList() {
+  updateCartBadge();
+  if (orderItems.length === 0) {
+    $("orderList").innerHTML = '<div style="text-align:center;padding:24px;color:#d0ccc4;font-size:13px;">还没选东西呢，还没选东西呢~</div>';
+    return;
+  }
+  $("orderList").innerHTML = orderItems.map(function(item, i) {
+    var c = cat(item.cat);
+    var qty = item.qty || 1;
+    return '<div class="order-list-item" style="flex-wrap:wrap">'
+      + '<div style="display:flex;align-items:center;width:100%">'
+      + '<span class="item-cat">' + c.emoji + " " + c.name + '</span>'
+      + '<span class="item-name">' + item.name + '</span>'
+      + '<div class="cart-qty">'
+      + '<button class="cart-qty-btn" data-i="' + i + '" data-d="-1">-</button>'
+      + '<span class="cart-qty-num">' + qty + '</span>'
+      + '<button class="cart-qty-btn" data-i="' + i + '" data-d="1">+</button>'
+      + '</div>'
+      + '<button class="remove-btn" data-i="' + i + '">×</button>'
+      + '</div>'
+      + (item.note ? '<div style="width:100%;font-size:11px;color:var(--amber);padding:2px 0 0 58px;">📝 ' + item.note + '</div>' : '')
+      + '</div>';
+  }).join("");
+
+  $("orderList").querySelectorAll(".cart-qty-btn").forEach(function(btn) {
+    btn.onclick = function(e) { e.stopPropagation();
+      var i = +btn.dataset.i, d = +btn.dataset.d;
+      orderItems[i].qty = (orderItems[i].qty || 1) + d;
+      if (orderItems[i].qty <= 0) { orderItems.splice(i, 1); }
+      renderList(); updateBtn(); renderCats();
+    };
+  });
+  $("orderList").querySelectorAll(".remove-btn").forEach(function(btn) {
+    btn.onclick = function(e) { e.stopPropagation();
+      orderItems.splice(+btn.dataset.i, 1);
+      renderList(); updateBtn(); renderCats();
+    };
+  });
+}
+
+function updateBtn() {
+  $("submitBtn").disabled = orderItems.length === 0;
+}
+
+function getExpectTime() {
+  var d = $("expectDate").value;
+  var h = $("expectHour").value;
+  var m = $("expectMin").value;
+  if (!d) return "";
+  return d + "T" + h + ":" + m;
+}
+
+$("submitBtn").onclick = function() {
+  if (!orderItems.length) return;
+  var note = orderItems.map(function(i) { return i.note || ""; }).filter(Boolean).join("；");
+  var expectTime = getExpectTime();
+  var modalItems = orderItems.map(function(item) {
+    var c = cat(item.cat);
+    var q = item.qty || 1;
+    return '<div class="summary-item"><span class="scat">' + c.emoji + " " + c.name + '</span><span>' + item.name + " ×" + q + '</span></div>';
+  }).join("");
+  var modalNote = note ? '<div style="margin-top:10px;font-size:12px;color:var(--amber);background:var(--amber-l);padding:8px 10px;border-radius:6px;">📝 ' + note + '</div>' : "";
+  var modalTime = expectTime ? '<div style="margin-top:10px;font-size:12px;color:var(--blue);background:var(--blue-l);padding:8px 10px;border-radius:6px;">⏰ 期望 ' + formatDateChinese(expectTime) + ' 前收到</div>' : '<div style="margin-top:10px;font-size:12px;color:var(--text2);padding:4px 0;">⏰ 未指定时间</div>';
+
+  $("modalHeader").textContent = "确认下单";
+  $("modalBody").innerHTML = '<div style="margin-bottom:12px;">'
+    + modalItems + modalTime + modalNote
+    + '</div>'
+    + '<div class="modal-actions"><button class="btn-cancel" id="mc">再想想</button><button class="btn-confirm pink" id="mk">确认下单 💕</button></div>';
+  $("modal").classList.add("show");
+  $("mc").onclick = function() { $("modal").classList.remove("show"); };
+  $("mk").onclick = function() {
+    $("mk").disabled = true;
+    insertOrder({
+      items: orderItems.slice(), note: orderItems.map(function(i) { return i.note || ""; }).filter(Boolean).join("；"),
+      status: "pending", method: null, time: new Date().toISOString(),
+      expectTime: getExpectTime()
+    }).then(function() {
+      orderItems = []; renderList(); updateBtn();
+      $("modal").classList.remove("show");
+      toast("下单成功！老公马上就来~ 💕");
+      loadAllOrders();
+      // 延迟发通知，不影响下单流程
+      // notifyHusband 已移除，改由老公端轮询检测
+    }).catch(function(e) {
+      toast("提交失败，重试一下~"); $("mk").disabled = false;
+    });
+  };
+};
+$("modal").onclick = function(e) { if (e.target === $("modal")) $("modal").classList.remove("show"); };
+
+function renderTabs() {
+  $("statusTabs").querySelectorAll(".status-tab").forEach(function(tab) {
+    tab.classList.toggle("active", tab.dataset.status === orderFilter);
+    tab.onclick = function() { orderFilter = tab.dataset.status; renderTabs(); renderOrders(); };
+  });
+}
+
+function renderOrders() {
+  // 正在写回复时不重绘
+  var activeEl = document.activeElement;
+  if (activeEl && activeEl.closest && activeEl.closest(".review-reply-box")) {
+    return;
+  }
+  var orders = allOrders.filter(function(o) { return o.status === orderFilter; });
+  var el = $("ordersList");
+  if (!orders.length) {
+    var msgs = {
+      pending: { e: "😊", t: "鑫鑫还没有新的订单~" },
+      accepted: { e: "👨‍🍳", t: "没有正在处理的订单" },
+      done: { e: "✅", t: "还没有完成过订单" }
+    };
+    var m = msgs[orderFilter];
+    el.innerHTML = '<div class="empty-state"><span class="emoji">' + m.e + '</span><p>' + m.t + '</p></div>';
+    return;
+  }
+  el.innerHTML = orders.map(function(o) {
+    var dt = new Date(o.time || o.created_at);
+    var time = (dt.getMonth()+1) + "/" + dt.getDate() + " " + String(dt.getHours()).padStart(2,"0") + ":" + String(dt.getMinutes()).padStart(2,"0");
+    var acts = "";
+    if (o.status === "cancelled") { /* no actions */ }
+      else if (o.status === "pending") {
+      acts = '<button class="order-action-btn btn-accept" data-id="' + o.id + '" data-a="accept">接单</button>'
+        + '<button class="order-action-btn btn-buy" data-id="' + o.id + '" data-a="buy">去买</button>'
+        + '<button class="order-action-btn btn-cook" data-id="' + o.id + '" data-a="cook">去做</button>';
+    } else if (o.status === "accepted") {
+      acts = '<button class="order-action-btn btn-done" data-id="' + o.id + '" data-a="done">完成 ✓</button>';
+    }
+    var sl = { pending: "待处理", accepted: "已接单", done: "已完成", cancelled: "已取消" };
+    var ml = o.method === "buy" ? "🛒 买好了" : o.method === "cook" ? "👨‍🍳 做好了" : o.method === "cancelled" ? "❌ 已取消" : "";
+    return '<div class="order-card"><div class="order-card-header"><span class="time">' + time + '</span>'
+      + '<span class="order-status ' + o.status + '">' + sl[o.status] + (ml ? " · " + ml : "") + '</span></div>'
+      + (o.items || []).map(function(item) {
+          var c = cat(item.cat);
+          var qstr = (item.qty && item.qty > 1) ? " ×" + item.qty : "";
+          return '<div class="order-item-line"><span class="ocat">' + (c ? c.emoji + " " + c.name : item.cat) + '</span><span>' + item.name + qstr + '</span></div>';
+        }).join("")
+      + (o.expectTime ? '<div class="order-note" style="border-left-color:var(--blue);color:var(--blue);background:var(--blue-l);">⏰ 期望 ' + formatDateChinese(o.expectTime) + ' 前收到</div>' : '')
+      + (o.note ? '<div class="order-note">📝 ' + o.note + '</div>' : "")
+      + (o.rating ? (
+          '<div class="review-display">' +
+          '<div class="stars">' + "★★★★★".slice(0, o.rating) + "☆☆☆☆☆".slice(0, 5 - o.rating) + '</div>' +
+          (o.review ? '<div style="margin-top:2px">' + o.review + '</div>' : '') +
+          (o.reply
+            ? '<div class="reply">💬 我的回复：' + o.reply + '</div>'
+            : '<div class="review-reply-box" data-oid="' + o.id + '" style="margin-top:6px">' +
+              '<textarea placeholder="回复鑫鑫的评价~" maxlength="200" style="width:100%;padding:6px 8px;border:1.5px solid var(--border);border-radius:4px;font-size:11px;font-family:inherit;resize:none;min-height:32px;outline:none;background:var(--bg)"></textarea>' +
+              '<button class="review-submit-btn" style="margin-top:4px">回复</button>' +
+              '</div>') +
+          '</div>'
+        ) : '')
+      + (acts ? '<div class="order-card-actions">' + acts + '</div>' : "") + '</div>';
+  }).join("");
+
+  // Reply handler
+  el.querySelectorAll(".review-reply-box").forEach(function(box) {
+    var oid = +box.dataset.oid;
+    box.querySelector(".review-submit-btn").onclick = function() {
+      var textarea = box.querySelector("textarea");
+      var replyText = textarea.value.trim();
+      if (!replyText) { toast("请输入回复内容~"); return; }
+      var order = allOrders.find(function(o) { return o.id === oid; });
+      if (!order) return;
+      var up = Object.assign({}, order);
+      delete up.id; delete up.created_at;
+      up.reply = replyText;
+      updateOrderById(oid, up).then(function() {
+        loadAllOrders().then(function() { renderOrders(); });
+        notifyWifeReply(replyText);
+        toast("回复成功！");
+      }).catch(function() { toast("回复失败~"); });
+    };
+  });
+
+  el.querySelectorAll(".order-action-btn").forEach(function(btn) {
+    btn.onclick = function() {
+      var id = +btn.dataset.id, a = btn.dataset.a;
+      var order = allOrders.find(function(o) { return o.id === id; });
+      if (!order) return;
+      var up = Object.assign({}, order);
+      delete up.id; delete up.created_at;
+      if (a === "accept") up.status = "accepted";
+      else if (a === "buy") { up.status = "done"; up.method = "buy"; }
+      else if (a === "cook") { up.status = "done"; up.method = "cook"; }
+      else if (a === "done") up.status = "done";
+      var willBeDone = (a === "buy" || a === "cook" || a === "done");
+      updateOrderById(id, up).then(function() {
+        if (willBeDone) notifyWifeDone();
+        loadAllOrders().then(function() {
+          setOnline(true);
+          if (role === "husband") { renderOrders(); autoCleanup(); }
+        });
+        var msgs = { accept: "已接单！", buy: "已购买 🛒", cook: "已做好 👨‍🍳", done: "完成 ✅" };
+        toast(msgs[a] || "完成");
+      }).catch(function() { toast("操作失败~"); });
+    };
+  });
+}
+
+function autoCleanup() {
+  var weekAgo = new Date(Date.now() - 7*24*60*60*1000).toISOString();
+  allOrders.forEach(function(o) {
+    if ((o.status === "done" || o.status === "cancelled") && o.created_at && o.created_at < weekAgo) {
+      api("/orders?id=eq." + o.id, { method: "DELETE" }).catch(function(){});
+    }
+  });
+}
+
+function formatDateChinese(dtStr) {
+  if (!dtStr) return "";
+  var dt = new Date(dtStr);
+  return (dt.getMonth() + 1) + "月" + dt.getDate() + "日 " +
+         String(dt.getHours()).padStart(2, "0") + ":" + String(dt.getMinutes()).padStart(2, "0");
+}
+
+function renderWifeTabs() {
+  var tabs = document.querySelectorAll("#wifeStatusTabs .status-tab");
+  tabs.forEach(function(tab) {
+    tab.classList.toggle("active", tab.dataset.status === wifeOrderFilter);
+    tab.onclick = function() {
+      wifeOrderFilter = tab.dataset.status;
+      renderWifeTabs();
+      renderWifeOrders();
+    };
+  });
+}
+
+function renderWifeOrders() {
+  // 正在写评价时不重绘，避免打断输入
+  var activeEl = document.activeElement;
+  if (activeEl && activeEl.closest && activeEl.closest(".review-box")) {
+    var box = activeEl.closest(".review-box");
+    var oid = box.dataset.oid;
+    if (activeEl.tagName === "TEXTAREA" && oid) pendingReviews[oid] = activeEl.value;
+    return;
+  }
+  var el = $("wifeOrdersList");
+  var orders = allOrders.filter(function(o) {
+    if (wifeOrderFilter === "active") return o.status === "pending" || o.status === "accepted";
+    return o.status === wifeOrderFilter;
+  }).slice(0, 20);
+  if (!orders.length) {
+    var wMsgs = {
+      active: { e: "📝", t: "没有进行中的订单~" },
+      done: { e: "✅", t: "还没有完成的订单" },
+      cancelled: { e: "❌", t: "没有已取消的订单" }
+    };
+    var wm = wMsgs[wifeOrderFilter] || { e: "📝", t: "没有订单~" };
+    el.innerHTML = '<div class="empty-state"><span class="emoji">' + wm.e + '</span><p>' + wm.t + '</p></div>';
+    return;
+  }
+  el.innerHTML = orders.map(function(o) {
+    var dt = new Date(o.time || o.created_at);
+    var time = (dt.getMonth()+1) + "/" + dt.getDate() + " " +
+               String(dt.getHours()).padStart(2,"0") + ":" + String(dt.getMinutes()).padStart(2,"0");
+    var items_text = (o.items || []).map(function(i) { return i.name + (i.qty && i.qty > 1 ? " ×" + i.qty : ""); }).join("、");
+    var canEdit = o.status !== "done" && o.status !== "cancelled";
+    var ml = o.method === "buy" ? " 🛒" : o.method === "cook" ? " 👨‍🍳" : o.method === "cancelled" ? " ❌" : "";
+    var sl = { pending: "待处理", accepted: "已接单", done: "已完成", cancelled: "已取消" };
+    return '<div class="wife-order-card">'
+      + '<div class="wo-header">'
+      + '<span class="wo-time">' + time + '</span>'
+      + '<span class="wo-status ' + o.status + '">' + sl[o.status] + ml + '</span>'
+      + '</div>'
+      + '<div class="wo-items">' + items_text + '</div>'
+      + (o.expectTime ? '<div style="font-size:11px;color:var(--blue);margin-top:4px;">⏰ 期望 ' + formatDateChinese(o.expectTime) + '</div>' : '')
+      + (o.note ? '<div class="wo-note" id="wnote-' + o.id + '">📝 ' + o.note + '</div>' : '<div class="wo-note" id="wnote-' + o.id + '" style="display:none"></div>')
+      + (canEdit ? '<div class="wo-actions"><button class="wo-action-btn edit" data-id="' + o.id + '" data-a="edit">修改备注</button><button class="wo-action-btn cancel" data-id="' + o.id + '" data-a="cancel">取消订单</button></div>' : '')
+      + (o.status === "done" ? (o.rating ? (
+          '<div class="review-display">' +
+          '<div class="stars">' + "★★★★★".slice(0, o.rating) + "☆☆☆☆☆".slice(0, 5 - o.rating) + '</div>' +
+          (o.review ? '<div style="margin-top:2px">' + o.review + '</div>' : '') +
+          (o.reply ? '<div class="reply">💬 老公回复：' + o.reply + '</div>' : '') +
+          '</div>'
+        ) : (
+          '<div class="review-box" data-oid="' + o.id + '">' +
+          '<div class="star-rating">' +
+          [1,2,3,4,5].map(function(s) { return '<span class="star" data-v="' + s + '">☆</span>'; }).join("") +
+          '</div>' +
+          '<textarea placeholder="说说味道怎么样~" maxlength="200"></textarea>' +
+          '<button class="review-submit-btn">提交评价 ⭐</button>' +
+          '</div>'
+        )) : '')
+      + '</div>';
+  }).join("");
+
+  // Restore pending ratings
+  Object.keys(pendingRatings).forEach(function(k) {
+    var box = el.querySelector('.review-box[data-oid="' + k + '"]');
+    if (box) {
+      var stars = box.querySelectorAll('.star');
+      var rv = pendingRatings[k];
+      var ratingDiv = box.querySelector('.star-rating');
+      if (ratingDiv) ratingDiv.dataset.rating = rv;
+      stars.forEach(function(ss, i) {
+        ss.textContent = i < rv ? "★" : "☆";
+        ss.classList.toggle("active", i < rv);
+      });
+    }
+  });
+
+  // Review handlers
+  el.querySelectorAll(".review-box").forEach(function(box) {
+    var oid = +box.dataset.oid, ratingVal = 0;
+    var stars = box.querySelectorAll(".star");
+    stars.forEach(function(s) {
+      s.onmouseenter = function() {
+        var v = +s.dataset.v;
+        stars.forEach(function(ss, i) { ss.textContent = i < v ? "★" : "☆"; ss.classList.toggle("hover", i < v); });
+      };
+    });
+    box.querySelector(".star-rating").onmouseleave = function() {
+      var rv = ratingVal || +(this.dataset.rating || 0);
+      stars.forEach(function(ss, i) {
+        ss.textContent = i < rv ? "★" : "☆";
+        ss.classList.remove("hover");
+        ss.classList.toggle("active", i < rv);
+      });
+    };
+    stars.forEach(function(s) {
+      s.onclick = function() {
+        ratingVal = +s.dataset.v;
+        pendingRatings[oid] = ratingVal;
+        s.parentElement.dataset.rating = ratingVal;
+        stars.forEach(function(ss, i) {
+          ss.textContent = i < ratingVal ? "★" : "☆";
+          ss.classList.remove("hover");
+          ss.classList.toggle("active", i < ratingVal);
+        });
+      };
+    });
+    // 监听文字输入
+    var ta = box.querySelector("textarea");
+    ta.oninput = function() { pendingReviews[oid] = ta.value; };
+    box.querySelector(".review-submit-btn").onclick = function() {
+      var textarea = box.querySelector("textarea");
+      var reviewText = textarea.value.trim();
+      if (ratingVal === 0) { toast("请先打星评分~ ⭐"); return; }
+      var order = allOrders.find(function(o) { return o.id === oid; });
+      if (!order) return;
+      var up = Object.assign({}, order);
+      delete up.id; delete up.created_at;
+      up.rating = ratingVal;
+      up.review = reviewText;
+      delete pendingRatings[oid];
+      updateOrderById(oid, up).then(function() {
+        loadAllOrders().then(function() { renderWifeOrders(); });
+        toast("评价成功！谢谢鑫鑫~ 💕");
+      }).catch(function() { toast("提交失败~"); });
+    };
+  });
+
+  // Edit note / cancel
+  el.querySelectorAll(".wo-action-btn").forEach(function(btn) {
+    btn.onclick = function(e) {
+      e.stopPropagation();
+      var id = +btn.dataset.id, a = btn.dataset.a;
+      var order = allOrders.find(function(o) { return o.id === id; });
+      if (!order) return;
+      if (a === "edit") {
+        var newNote = prompt("修改备注：", order.note || "");
+        if (newNote === null) return;
+        var up = Object.assign({}, order);
+        delete up.id; delete up.created_at;
+        up.note = newNote;
+        updateOrderById(id, up).then(function() {
+          loadAllOrders().then(function() { renderWifeOrders(); });
+          toast("备注已更新");
+        }).catch(function() { toast("更新失败~"); });
+      } else if (a === "cancel") {
+        if (!confirm("确定要取消这个订单吗？")) return;
+        var up = Object.assign({}, order);
+        delete up.id; delete up.created_at;
+        up.status = "cancelled";
+        up.method = "cancelled";
+        updateOrderById(id, up).then(function() {
+          loadAllOrders().then(function() { renderWifeOrders(); });
+          toast("订单已取消");
+        }).catch(function() { toast("取消失败~"); });
+      }
+    };
+  });
+}
+</script>
+</body>
+</html>
