@@ -1285,6 +1285,7 @@ $("submitBtn").onclick = function() {
       status: "pending", method: null, time: new Date().toISOString(),
       expectTime: getExpectTime()
     }).then(function() {
+      var submittedItems = orderItems.slice();
       orderItems = []; renderList(); updateBtn();
       $("modal").classList.remove("show");
       toast("下单成功！老公马上就来~ 💕");
