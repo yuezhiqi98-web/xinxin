@@ -1377,7 +1377,6 @@ function renderOrders() {
       up.reply = replyText;
       updateOrderById(oid, up).then(function() {
         loadAllOrders().then(function() { renderOrders(); });
-        notifyWifeReply(replyText);
         toast("回复成功！");
       }).catch(function() { toast("回复失败~"); });
     };
@@ -1394,9 +1393,7 @@ function renderOrders() {
       else if (a === "buy") { up.status = "done"; up.method = "buy"; }
       else if (a === "cook") { up.status = "done"; up.method = "cook"; }
       else if (a === "done") up.status = "done";
-      var willBeDone = (a === "buy" || a === "cook" || a === "done");
       updateOrderById(id, up).then(function() {
-        if (willBeDone) notifyWifeDone();
         loadAllOrders().then(function() {
           setOnline(true);
           if (role === "husband") { renderOrders(); autoCleanup(); }
