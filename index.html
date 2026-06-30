@@ -885,12 +885,9 @@ function updateOrderById(id, newData) {
 }
 
 // ====== Server酱微信推送 ======
-// 去 sct.ftqq.com 注册，把 SendKey 填在这里：
-var SCKEY_HUSBAND = "SCT367869Tui1YQW7gLTY2LT7Ee4hTJFAT";
-
-// ====== Server酱微信推送 ======
 var SCKEY_HUSBAND = "SCT367869Tui1YQW7gLTY2LT7Ee4hTJFAT";
 var SCKEY_WIFE = "";
+var notifiedOrderIds = {};
 
 function scSend(key, title, desp) {
   if (!key) return;
@@ -1284,13 +1281,17 @@ $("submitBtn").onclick = function() {
       items: orderItems.slice(), note: orderItems.map(function(i) { return i.note || ""; }).filter(Boolean).join("；"),
       status: "pending", method: null, time: new Date().toISOString(),
       expectTime: getExpectTime()
-    }).then(function() {
+    }).then(function(rows) {
       var submittedItems = orderItems.slice();
+      var saved = rows && rows[0];
       orderItems = []; renderList(); updateBtn();
       $("modal").classList.remove("show");
       toast("下单成功！老公马上就来~ 💕");
-      // 微信通知老公
-      scSend(SCKEY_HUSBAND, "🔔 鑫鑫下单啦", submittedItems.map(function(i){return i.name + (i.qty>1?' x'+i.qty:'');}).join("、"));
+      // 微信通知老公，同一订单在当前页面内只通知一次
+      if (!saved || !notifiedOrderIds[saved.id]) {
+        if (saved) notifiedOrderIds[saved.id] = true;
+        scSend(SCKEY_HUSBAND, "🔔 鑫鑫下单啦", submittedItems.map(function(i){return i.name + (i.qty>1?' x'+i.qty:'');}).join("、"));
+      }
       loadAllOrders();
     }).catch(function(e) {
       toast("提交失败，重试一下~"); $("mk").disabled = false;
